@@ -1,0 +1,20 @@
+{
+  "name": "screen-mail",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capturas acumulativas con transcripción de Groq y envío por correo.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.js && node --check capture.js && node --check selector.js && node --check draft.js && node --check vision.js && node --check mail.js && node --check preload.js && node --check panel.js",
+    "test": "node --test test/*.test.js",
+    "test:ui": "electron test/panel.smoke.js",
+    "groq:limits": "node scripts/groq-limits.js"
+  },
+  "dependencies": {
+    "nodemailer": "^10.5.0"
+  },
+  "devDependencies": {
+    "electron": "^43.3.0"
+  }
+}

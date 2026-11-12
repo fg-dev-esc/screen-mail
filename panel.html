@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>Screen Mail</title>
+    <link rel="stylesheet" href="panel.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="brand"><span class="brand-mark" aria-hidden="true"></span> screen mail</span>
+        <button id="close" class="icon-button" title="Ocultar · Esc" aria-label="Ocultar panel">×</button>
+      </header>
+      <div id="config" class="banner" hidden></div>
+      <section class="toolbar">
+        <span id="summary">0 capturas</span>
+        <button id="capture">+ Capturar <kbd>Ctrl+Mayús+S</kbd></button>
+      </section>
+      <div class="capture-settings">
+        <label for="capture-mode">CAPTURA</label>
+        <select id="capture-mode">
+          <option value="screen">Pantalla completa</option>
+          <option value="region">Seleccionar sección</option>
+        </select>
+        <!-- <span title="Mostrar u ocultar el panel">Abrir / ocultar · Ctrl+Mayús+A</span> -->
+      </div>
+      <section id="gallery" aria-label="Capturas y transcripciones">
+        <div id="empty">
+          <span class="empty-symbol">⌗</span>
+          <p>Captura → IA → Correo</p>
+          <small>Ctrl+Mayús+S captura<br>Ctrl+Mayús+A abrir / oculta</small>
+        </div>
+      </section>
+      <form id="composer">
+        <label for="note">MENSAJE <span></span></label>
+        <textarea id="note" rows="2" maxlength="100000" placeholder="Escribe un mensaje…"></textarea>
+        <footer>
+          <p id="status" role="status" aria-live="polite">Listo para capturar</p>
+          <button id="send" type="submit" disabled>Enviar <kbd>Ctrl+Enter</kbd></button>
+        </footer>
+      </form>
+    </main>
+    <dialog id="lightbox">
+      <button id="preview-close" class="icon-button" aria-label="Cerrar imagen">×</button>
+      <img id="full-image" alt="Captura ampliada">
+    </dialog>
+    <template id="shot-template">
+      <article class="shot">
+        <div class="shot-heading">
+          <span class="shot-name"></span>
+          <span class="ocr-status"></span>
+          <button class="cancel-ocr" title="Cancelar OCR conservando la imagen">Cancelar OCR</button>
+          <button class="remove icon-button" title="Quitar captura" aria-label="Quitar captura">×</button>
+        </div>
+        <button class="thumbnail" title="Ampliar captura"><img alt=""></button>
+        <div class="transcription">
+          <label>TRANSCRIPCIÓN <span>editable</span></label>
+          <textarea class="transcript" rows="3" maxlength="100000" spellcheck="false" aria-label="Texto transcrito"></textarea>
+          <div class="ocr-error" hidden><span></span><button class="retry">Reintentar</button></div>
+        </div>
+      </article>
+    </template>
+    <script src="panel.js"></script>
+  </body>
+</html>

@@ -46,6 +46,15 @@ test("el correo identifica el texto parcial para no presentarlo como una transcr
   assert.match(message.text, /Transcripción parcial\ntexto recuperado/);
 });
 
+test("una transcripción borrada no aparece en el correo pero la imagen sí se envía", () => {
+  const shots = [{ id: "cleared", buffer: Buffer.from("png"), transcript: "", ocrStatus: "ready", error: "" }];
+  const message = buildMessage(shots, "Solo la imagen", "me@example.com");
+  assert.equal(message.text, "Solo la imagen");
+  assert.equal(message.attachments.length, 1);
+  assert.ok(message.html.includes("cid:cleared@screen-mail"));
+  assert.ok(!message.html.includes("<pre"));
+});
+
 test("Gmail acepta la clave agrupada con espacios sin cambiar contraseñas de otros proveedores", async (context) => {
   const keys = ["MAIL_USER", "MAIL_APP_PASSWORD", "SMTP_HOST", "SMTP_MAX_MB"];
   const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));

@@ -23,6 +23,16 @@ function makeCard(shot) {
   card.querySelector(".remove").addEventListener("click", () => run(() => window.mail.remove(shot.id)));
   card.querySelector(".retry").addEventListener("click", () => run(() => window.mail.retry(shot.id)));
   card.querySelector(".cancel-ocr").addEventListener("click", () => run(() => window.mail.cancel(shot.id)));
+  const input = card.querySelector(".transcript");
+  card.querySelector(".clear-transcript").addEventListener("click", () => run(async () => {
+    await window.mail.edit(shot.id, "");
+    const target = current?.shots.find((item) => item.id === shot.id);
+    if (target) target.transcript = "";
+    input.value = "";
+    render(current);
+  }));
+  card.querySelector(".restore").addEventListener("click", () => run(() => window.mail.restore(shot.id)));
+  card.querySelector(".retranscribe").addEventListener("click", () => run(() => window.mail.retry(shot.id)));
   card.querySelector(".transcript").addEventListener("input", (event) => {
     run(() => window.mail.edit(shot.id, event.target.value));
   });
@@ -58,7 +68,12 @@ function render(state) {
     const input = card.querySelector(".transcript");
     if (document.activeElement !== input) input.value = shot.transcript;
     input.disabled = locked || !["ready", "partial"].includes(shot.ocrStatus);
-    input.placeholder = shot.ocrStatus === "error" ? "Puedes enviar esta imagen sin transcripción o reintentar." : "Groq está preparando la transcripción…";
+    input.placeholder = ["pending", "processing", "waiting"].includes(shot.ocrStatus) ? "Groq está preparando la transcripción…"
+      : ["ready", "partial"].includes(shot.ocrStatus) ? "" : "Puedes enviar esta imagen sin transcripción o reintentar.";
+    const editable = ["ready", "partial"].includes(shot.ocrStatus);
+    const clearButton = card.querySelector(".clear-transcript");
+    clearButton.disabled = locked || !editable || !input.value;
+    card.querySelector(".transcript-cleared").hidden = locked || !editable || Boolean(input.value) || !shot.canRestore;
     card.querySelector(".remove").disabled = locked;
     card.querySelector(".retry").disabled = locked;
     card.querySelector(".retry").hidden = !["error", "cancelled"].includes(shot.ocrStatus);
@@ -93,6 +108,12 @@ note.addEventListener("input", () => {
     render(current);
   }
   run(() => window.mail.setNote(note.value));
+});
+note.addEventListener("paste", (event) => {
+  const items = [...(event.clipboardData?.items || [])];
+  if (!items.some((item) => item.kind === "file" && item.type.startsWith("image/"))) return;
+  event.preventDefault();
+  run(() => window.mail.pasteImage());
 });
 captureButton.addEventListener("click", () => run(() => window.mail.capture()));
 document.querySelector("#capture-mode").addEventListener("change", (event) => {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, globalShortcut, ipcMain, Menu, nativeImage, screen, Tray } = require("electron");
+const { app, BrowserWindow, clipboard, dialog, globalShortcut, ipcMain, Menu, nativeImage, screen, Tray } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs");
 const { captureDisplay } = require("./capture");
@@ -65,12 +65,22 @@ async function capture() {
   publish();
   try {
     const image = await captureDisplay(panel, captureMode);
-    if (image) draft.add(image.toPNG(), image.resize({ width: Math.min(480, image.getSize().width) }).toDataURL());
+    if (image) addImage(image);
   } finally {
     draft.capturing = false;
     publish();
     showPanel();
   }
+}
+
+function addImage(image) {
+  draft.add(image.toPNG(), image.resize({ width: Math.min(480, image.getSize().width) }).toDataURL());
+}
+
+function pasteImage() {
+  const image = clipboard.readImage();
+  if (image.isEmpty()) throw new Error("El portapapeles no contiene una imagen para pegar.");
+  addImage(image);
 }
 
 function icon() {
@@ -129,11 +139,13 @@ async function bootstrap() {
   });
   handle("draft:get", state);
   handle("draft:capture", capture);
+  handle("draft:paste", pasteImage);
   handle("settings:capture-mode", setCaptureMode);
   handle("draft:note", (text) => draft.setNote(text));
   handle("draft:edit", (id, text) => draft.edit(id, text));
   handle("draft:remove", (id) => draft.remove(id));
   handle("draft:retry", (id) => draft.retry(id));
+  handle("draft:restore", (id) => draft.restore(id));
   handle("draft:cancel", (id) => draft.cancel(id));
   handle("draft:send", ({ note, transcripts }) => {
     draft.setNote(note);

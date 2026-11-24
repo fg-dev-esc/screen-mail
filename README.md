@@ -35,7 +35,9 @@ Consulta las cuotas exactas en https://console.groq.com/settings/limits (pasa el
 - **Ctrl+Mayús+S:** captura usando el modo elegido en el panel. El panel se oculta brevemente antes de capturar.
 - **Modo de captura:** elige **Pantalla completa** (monitor donde está el cursor) o **Seleccionar sección** (arrastra un rectángulo sobre ese monitor; Esc cancela). Se guarda automáticamente en `settings.json` dentro del directorio de datos de la app y se conserva al reiniciar. El atajo usa directamente ese modo, sin preguntar cuál quieres en cada captura.
 - Cada captura se añade al borrador y se transcribe en segundo plano, en orden. Puedes seguir capturando mientras se procesa OCR.
+- **Pegar captura (Ctrl+V):** con una imagen en el portapapeles, pégala en el campo MENSAJE; se añade al borrador y se transcribe igual que una captura normal.
 - Pulsa una miniatura para ampliarla. Corrige la transcripción directamente en su cuadro de texto.
+- **× de la transcripción:** borra el texto transcrito para enviar solo la imagen. El resultado original de Groq se conserva: el aviso **Restaurar** lo recupera y **Reintentar** vuelve a transcribir la imagen.
 - **× de una captura:** elimina esa imagen del borrador; si se estaba transcribiendo, cancela la solicitud.
 - Escribe un mensaje, con o sin imágenes. Puedes enviar solo texto; un borrador sin imágenes y con texto vacío o solo espacios no se envía.
 - **Ctrl+Enter dentro del panel**, o **Enviar:** espera las transcripciones pendientes y envía un correo con imágenes incrustadas y sus textos. Durante el envío, el borrador queda bloqueado.

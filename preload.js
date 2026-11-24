@@ -9,11 +9,13 @@ async function invoke(channel, ...args) {
 contextBridge.exposeInMainWorld("mail", {
   getDraft: () => invoke("draft:get"),
   capture: () => invoke("draft:capture"),
+  pasteImage: () => invoke("draft:paste"),
   setCaptureMode: (mode) => invoke("settings:capture-mode", mode),
   setNote: (text) => invoke("draft:note", text),
   edit: (id, text) => invoke("draft:edit", id, text),
   remove: (id) => invoke("draft:remove", id),
   retry: (id) => invoke("draft:retry", id),
+  restore: (id) => invoke("draft:restore", id),
   cancel: (id) => invoke("draft:cancel", id),
   send: (value) => invoke("draft:send", value),
   preview: (id) => invoke("draft:preview", id),

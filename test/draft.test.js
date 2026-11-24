@@ -244,3 +244,28 @@ test("el estado público omite buffers y el envío espera a que acabe la captura
   draft.capturing = true;
   await assert.rejects(draft.send(), /termine la captura/);
 });
+
+test("borrar la transcripción omite su envío y permite restaurar o reintentar el OCR", async () => {
+  let attempts = 0;
+  let sent;
+  const draft = new Draft({
+    transcribe: async () => `texto ${++attempts}`,
+    sendMail: async (shots) => { sent = shots.map((shot) => shot.transcript); },
+  });
+  const id = draft.add(Buffer.from("png"), "preview");
+  await draft.queue;
+  assert.equal(draft.snapshot().shots[0].canRestore, true);
+  draft.edit(id, "");
+  assert.equal(draft.snapshot().shots[0].transcript, "");
+  draft.restore(id);
+  assert.equal(draft.shots[0].transcript, "texto 1");
+  draft.edit(id, "");
+  draft.retry(id);
+  await draft.queue;
+  assert.equal(attempts, 2, "reintentar con la transcripción borrada vuelve a ejecutar el OCR");
+  assert.equal(draft.shots[0].transcript, "texto 2");
+  draft.edit(id, "");
+  await draft.send();
+  assert.deepEqual(sent, [""], "sin transcripción solo se envía la imagen");
+  assert.throws(() => draft.restore(id), /restaurar/, "tras enviar ya no hay nada que restaurar");
+});

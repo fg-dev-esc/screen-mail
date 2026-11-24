@@ -30,12 +30,12 @@
         <div id="empty">
           <span class="empty-symbol">⌗</span>
           <p>Captura → IA → Correo</p>
-          <small>Ctrl+Mayús+S captura<br>Ctrl+Mayús+A abrir / oculta</small>
+          <small>Ctrl+Mayús+S captura<br>Ctrl+V pega captura en el mensaje<br>Ctrl+Mayús+A abrir / oculta</small>
         </div>
       </section>
       <form id="composer">
         <label for="note">MENSAJE <span></span></label>
-        <textarea id="note" rows="2" maxlength="100000" placeholder="Escribe un mensaje…"></textarea>
+        <textarea id="note" rows="2" maxlength="100000" placeholder="Escribe un mensaje… o pega una captura (Ctrl+V)"></textarea>
         <footer>
           <p id="status" role="status" aria-live="polite">Listo para capturar</p>
           <button id="send" type="submit" disabled>Enviar <kbd>Ctrl+Enter</kbd></button>
@@ -56,8 +56,16 @@
         </div>
         <button class="thumbnail" title="Ampliar captura"><img alt=""></button>
         <div class="transcription">
-          <label>TRANSCRIPCIÓN <span>editable</span></label>
+          <div class="transcription-head">
+            <label>TRANSCRIPCIÓN <span>editable</span></label>
+            <button type="button" class="clear-transcript" title="Quitar transcripción: solo se enviará la imagen" aria-label="Quitar transcripción">×</button>
+          </div>
           <textarea class="transcript" rows="3" maxlength="100000" spellcheck="false" aria-label="Texto transcrito"></textarea>
+          <div class="transcript-cleared" hidden>
+            <span>Borrada · solo se enviará la imagen.</span>
+            <button type="button" class="restore">Restaurar</button>
+            <button type="button" class="retranscribe">Reintentar</button>
+          </div>
           <div class="ocr-error" hidden><span></span><button class="retry">Reintentar</button></div>
         </div>
       </article>

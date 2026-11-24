@@ -49,14 +49,19 @@ kbd { font: 10px "Geist Mono", monospace; opacity: .65; margin-left: 10px; }
 .thumbnail { display: block; width: 100%; height: 150px; padding: 0; border: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #080808; }
 .thumbnail img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .transcription { padding: 12px; }
+.transcription-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.transcription-head label { margin-bottom: 0; }
+.clear-transcript { border: 0; width: 22px; height: 22px; padding: 0; color: var(--muted); font-size: 16px; line-height: 1; }
+.clear-transcript:hover:not(:disabled) { color: var(--text); background: #222; }
 label { display: block; margin-bottom: 8px; color: var(--muted); font: 500 11px "Geist Mono", monospace; letter-spacing: .08em; }
 label span { margin-left: 5px; font-size: 10px; letter-spacing: 0; text-transform: none; color: #666; }
 textarea { display: block; width: 100%; padding: 10px; resize: vertical; min-height: 60px; max-height: 200px; color: var(--text); background: var(--bg); border: 1px solid var(--border); line-height: 1.5; }
 .transcript { font: 11px/1.6 "Geist Mono", monospace; }
 textarea:disabled { color: var(--muted); }
-.ocr-error { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 11px; }
-.ocr-error span { flex: 1; overflow-wrap: anywhere; }
-.retry { flex-shrink: 0; font-size: 11px; }
+.ocr-error, .transcript-cleared { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 11px; }
+.ocr-error span, .transcript-cleared span { flex: 1; overflow-wrap: anywhere; }
+.transcript-cleared { color: var(--muted); }
+.retry, .transcript-cleared button { flex-shrink: 0; font-size: 11px; }
 #composer { padding: 16px 18px 12px; border-top: 1px solid var(--border); background: var(--surface); }
 #note { resize: none; }
 footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 12px; }

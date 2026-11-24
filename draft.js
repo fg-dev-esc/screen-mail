@@ -19,8 +19,8 @@ class Draft extends EventEmitter {
 
   snapshot() {
     return {
-      shots: this.shots.map(({ id, preview, transcript, ocrStatus, error, buffer, retryAt }) => ({
-        id, preview, transcript, ocrStatus, error, retryAt, bytes: buffer.length,
+      shots: this.shots.map(({ id, preview, transcript, ocrStatus, error, buffer, retryAt, ocrOriginal }) => ({
+        id, preview, transcript, ocrStatus, error, retryAt, bytes: buffer.length, canRestore: Boolean(ocrOriginal),
       })),
       note: this.note,
       sending: this.sending,
@@ -64,6 +64,7 @@ class Draft extends EventEmitter {
             const text = await this.transcribe(shot.buffer, { signal: controller.signal });
             if (active()) {
               shot.transcript = text;
+              shot.ocrOriginal = text;
               shot.ocrStatus = "ready";
             }
             break;
@@ -80,7 +81,10 @@ class Draft extends EventEmitter {
       } catch (error) {
         if (active()) {
           shot.ocrStatus = error.partialText ? "partial" : "error";
-          if (error.partialText) shot.transcript = error.partialText;
+          if (error.partialText) {
+            shot.transcript = error.partialText;
+            shot.ocrOriginal = error.partialText;
+          }
           shot.error = error.name === "TimeoutError" ? "Groq tardó demasiado. Reintenta la transcripción." : error.message;
         }
       } finally {
@@ -106,7 +110,19 @@ class Draft extends EventEmitter {
   retry(id) {
     this.assertEditable();
     const shot = this.shots.find((item) => item.id === id);
-    if (["error", "cancelled"].includes(shot?.ocrStatus)) this.enqueue(shot);
+    if (!shot) return;
+    // Además de los fallos, se relanza el OCR si el usuario borró la transcripción.
+    const cleared = ["ready", "partial"].includes(shot.ocrStatus) && !shot.transcript;
+    if (["error", "cancelled"].includes(shot.ocrStatus) || cleared) this.enqueue(shot);
+  }
+
+  restore(id) {
+    this.assertEditable();
+    const shot = this.shots.find((item) => item.id === id);
+    if (!shot?.ocrOriginal) throw new Error("No hay transcripción original que restaurar.");
+    if (!["ready", "partial"].includes(shot.ocrStatus)) throw new Error("La transcripción todavía no está terminada.");
+    shot.transcript = shot.ocrOriginal;
+    this.changed();
   }
 
   cancel(id) {

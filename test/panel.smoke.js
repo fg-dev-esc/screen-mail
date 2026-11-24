@@ -1,4 +1,4 @@
-const { app, nativeImage, screen } = require("electron");
+const { app, nativeImage, screen, clipboard } = require("electron");
 const fs = require("node:fs");
 const path = require("node:path");
 const assert = require("node:assert/strict");
@@ -59,6 +59,11 @@ loaded.then(async (window) => {
   await waitFor('document.querySelector(".shot")?.dataset.status === "ready"');
   assert.equal(await evaluate('document.querySelector(".transcript").value'), "texto original");
   assert.equal(captureModes[0], "region");
+  // Borrar la transcripción con la × y restaurarla desde la UI.
+  await evaluate('document.querySelector(".clear-transcript").click()');
+  await waitFor('!document.querySelector(".transcript").value && !document.querySelector(".transcript-cleared").hidden');
+  await evaluate('document.querySelector(".restore").click()');
+  await waitFor('document.querySelector(".transcript").value === "texto original"');
   await evaluate(`
     document.querySelector('#note').value = 'comentario conservado';
     document.querySelector('#note').dispatchEvent(new Event('input'));
@@ -97,6 +102,19 @@ loaded.then(async (window) => {
   await waitFor('document.querySelector("#status").textContent.startsWith("Enviado")');
   assert.deepEqual(sent[3], { note: "Mensaje sin imágenes", transcripts: [] });
   assert.equal(ocrCalls, 2);
+  // Pegar una captura desde el portapapeles en el campo de mensaje.
+  const previousImage = clipboard.readImage();
+  const previousText = clipboard.readText();
+  clipboard.writeImage(syntheticImage());
+  await evaluate(`
+    const data = new DataTransfer();
+    data.items.add(new File([new Uint8Array([137, 80, 78, 71])], "pegada.png", { type: "image/png" }));
+    document.querySelector("#note").dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+  `);
+  await waitFor('document.querySelectorAll(".shot").length === 1 && document.querySelector(".shot-name").textContent === "CAPTURA 01"');
+  assert.equal(await evaluate('document.querySelector("#note").value'), "", "pegar una imagen no inserta texto en el mensaje");
+  if (!previousImage.isEmpty()) clipboard.writeImage(previousImage);
+  else if (previousText) clipboard.writeText(previousText);
   const fonts = await evaluate(`Promise.all([
     document.fonts.load('14px Geist'),
     document.fonts.load('14px "Geist Pixel"'),
